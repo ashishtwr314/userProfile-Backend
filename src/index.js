@@ -25,5 +25,3 @@ app.use("/courses/", require("./routes/courses"));
 app.listen(PORT || 8000, () => {
   console.log(`APP STARTED ON PORT ${PORT}`);
 });
-
-module.exports.handler = serverless(app);
