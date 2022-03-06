@@ -5,8 +5,6 @@ require("dotenv").config();
 const db = require("./dbConnection");
 const app = express();
 
-const serverless = require("serverless-http");
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -21,13 +19,11 @@ db.authenticate()
     console.log("ERR", err);
   });
 
-const NETLIFY_ROOT = "/.netlify/functions/api";
+app.use("/users/", require("./routes/users"));
+app.use("/courses/", require("./routes/courses"));
 
-app.use(NETLIFY_ROOT + "/users/", require("./routes/users"));
-app.use(NETLIFY_ROOT + "/courses/", require("./routes/courses"));
-
-// app.listen(PORT || 8000, () => {
-//   console.log(`APP STARTED ON PORT ${PORT}`);
-// });
+app.listen(PORT || 8000, () => {
+  console.log(`APP STARTED ON PORT ${PORT}`);
+});
 
 module.exports.handler = serverless(app);
