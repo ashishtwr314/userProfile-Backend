@@ -22,6 +22,9 @@ const Users = db.define("user", {
   role: {
     type: Sequelize.STRING,
   },
+  provider: {
+    type: Sequelize.STRING,
+  },
 });
 
 module.exports = Users;

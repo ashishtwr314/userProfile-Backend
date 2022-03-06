@@ -70,6 +70,7 @@ coursesRouter.post("/add", authenticateToken, (req, res) => {
 // -------------- DELETE COURSES
 
 coursesRouter.delete("/:course_id", authenticateToken, (req, res) => {
+  if (!req.params.course_id) return;
   if (req.user.role !== "admin") {
     return res.status(403).send({
       err: true,
@@ -79,7 +80,7 @@ coursesRouter.delete("/:course_id", authenticateToken, (req, res) => {
 
   Courses.destroy({
     where: {
-      course_id: req.body.course_id,
+      course_id: req.params.course_id,
     },
   })
     .then((cousrDelRes) => {
@@ -313,7 +314,7 @@ coursesRouter.get("/:course_id", authenticateToken, (req, res) => {
 });
 
 // --------- REGISTER BY COURSE_ID
-coursesRouter.get("/register/:course_id", authenticateToken, (req, res) => {
+coursesRouter.post("/register/:course_id", authenticateToken, (req, res) => {
   if (!req.params.course_id) return;
   if (req.user.role !== "intern") {
     return res.status(403).send({
@@ -322,7 +323,6 @@ coursesRouter.get("/register/:course_id", authenticateToken, (req, res) => {
     });
   }
 
-  console.log("USERNAME", req.user.username);
   Assignment.create({
     username: req.user.username,
     course_id: req.params.course_id,

@@ -6,7 +6,15 @@ const authenticateToken = require("../middlewares/authenticateToken");
 const userRouter = express.Router();
 
 userRouter.post("/signup", async (req, res) => {
-  let { username, name, password, email, profile_pic, role } = req.body;
+  let {
+    username,
+    name,
+    password,
+    email,
+    profile_pic,
+    role,
+    provider,
+  } = req.body;
 
   if (!password) {
     res.send({
@@ -25,6 +33,7 @@ userRouter.post("/signup", async (req, res) => {
     email,
     profile_pic,
     role,
+    provider,
   })
     .then((userCreatedResponse) => {
       if (userCreatedResponse) {
@@ -69,10 +78,16 @@ userRouter.post("/login", async (req, res) => {
               err: false,
               message: "Login Successfull",
               authToken: jwtToken,
+              username: user.username,
+              profile_pic: user.profile_pic,
+              email: user.email,
+              name: user.name,
+              role: user.role,
             });
           } else {
             res.send({
               err: true,
+
               msg: "Email or Password is Invalid!",
             });
           }
@@ -86,6 +101,39 @@ userRouter.post("/login", async (req, res) => {
     })
     .catch((err) => {
       res.send(err.message);
+    });
+});
+
+userRouter.put("/updateuserinfo", authenticateToken, (req, res) => {
+  const { profile_pic, name } = req.body;
+
+  Users.update(
+    { profile_pic: profile_pic, name: name },
+    {
+      where: {
+        username: req.user.username,
+      },
+    }
+  )
+    .then((userRes) => {
+      console.log(userRes);
+      if (userRes[0]) {
+        res.send({
+          err: false,
+          message: "Updated Successfully",
+        });
+      } else {
+        res.send({
+          err: false,
+          message: "Updation Failed",
+        });
+      }
+    })
+    .catch((err) => {
+      res.send({
+        err: true,
+        message: "Something went wrong",
+      });
     });
 });
 
@@ -179,7 +227,7 @@ userRouter.delete("/trainer/:username", authenticateToken, async (req, res) => {
 
   Users.destroy({
     where: {
-      username: username,
+      username: req.params.username,
     },
   })
     .then((deleteUserRes) => {
@@ -216,7 +264,7 @@ userRouter.put("/trainer/:username", authenticateToken, async (req, res) => {
     },
     {
       where: {
-        username: username,
+        username: req.params.username,
       },
     }
   )
